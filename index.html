@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SMADA GENERATOR - Modul Ajar AI</title>
+    
+    <link id="pwa-manifest" rel="manifest" href="">
+    <meta name="theme-color" content="#7D84E8">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js for rendering Markdown from Gemini -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        :root {
+            --periwinkle-bg: #8E94F2;
+            --sidebar-top: #7D84E8;
+            --sidebar-bottom: #656CD6;
+            --cream-canvas: #FAF6F0;
+            --cream-card: #FFFDF9;
+            --ink-primary: #1E1B4B;
+            --ink-muted: #64748B;
+            --accent-purple: #7C5CFA;
+            --accent-purple-dark: #6544E8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #9CA2F6 0%, #7E85E9 100%);
+            color: var(--ink-primary);
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Fullscreen App Frame matching the Pastel Dashboard Reference */
+        #app-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #9CA2F6 0%, #7E85E9 100%);
+            z-index: 999999;
+            overflow: hidden;
+            display: flex;
+            padding: 0;
+        }
+
+        @media (min-width: 768px) {
+            #app-wrapper {
+                padding: 16px;
+                gap: 16px;
+            }
+        }
+
+        /* Claymorphic Periwinkle Sidebar */
+        .clay-sidebar {
+            background: linear-gradient(180deg, var(--sidebar-top) 0%, var(--sidebar-bottom) 100%);
+            border-radius: 28px;
+            box-shadow:
+                0 20px 40px -10px rgba(67, 73, 168, 0.45),
+                inset 0 2px 4px rgba(255, 255, 255, 0.35),
+                inset 0 -4px 8px rgba(49, 54, 138, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+        }
+
+        /* Warm Cream Main Canvas */
+        .clay-canvas {
+            background: var(--cream-canvas);
+            border-radius: 0;
+            box-shadow:
+                0 20px 45px -10px rgba(67, 73, 168, 0.35),
+                inset 0 2px 6px rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+        }
+
+        @media (min-width: 768px) {
+            .clay-canvas {
+                border-radius: 28px;
+            }
+        }
+
+        /* Tactile Soft Clay Cards */
+        .clay-card {
+            background: var(--cream-card);
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow:
+                0 10px 25px -6px rgba(101, 108, 214, 0.10),
+                0 2px 6px -1px rgba(101, 108, 214, 0.05),
+                inset 0 2px 3px rgba(255, 255, 255, 1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Hero Banner Gradient (Pastel Pink -> Lavender) */
+        .clay-hero {
+            background: linear-gradient(125deg, #FCE0EC 0%, #F3E2F9 52%, #E5E0FC 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow:
+                0 12px 28px -8px rgba(168, 120, 198, 0.22),
+                inset 0 2px 4px rgba(255, 255, 255, 0.95);
+        }
+
+        /* 3D Pill Primary Button */
+        .clay-btn-primary {
+            background: linear-gradient(180deg, #8B6DFB 0%, #6E4DF2 100%);
+            color: #ffffff;
+            border-radius: 9999px;
+            box-shadow:
+                0 8px 18px -4px rgba(110, 77, 242, 0.45),
+                inset 0 2px 3px rgba(255, 255, 255, 0.45),
+                inset 0 -2px 4px rgba(67, 40, 176, 0.35);
+            transition: all 0.2s ease;
+        }
+        .clay-btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow:
+                0 12px 22px -4px rgba(110, 77, 242, 0.55),
+                inset 0 2px 3px rgba(255, 255, 255, 0.5);
+        }
+        .clay-btn-primary:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        /* Pastel KPI Cards matching the 4 reference cards */
+        .pastel-blue-card {
+            background: linear-gradient(145deg, #E2EFFE 0%, #D3E6FC 100%);
+            border-radius: 22px;
+            box-shadow: 0 8px 20px -6px rgba(75, 147, 245, 0.2), inset 0 2px 3px rgba(255,255,255,0.9);
+        }
+        .pastel-pink-card {
+            background: linear-gradient(145deg, #FDE4EC 0%, #FAD5E2 100%);
+            border-radius: 22px;
+            box-shadow: 0 8px 20px -6px rgba(244, 107, 155, 0.2), inset 0 2px 3px rgba(255,255,255,0.9);
+        }
+        .pastel-yellow-card {
+            background: linear-gradient(145deg, #FEF5DC 0%, #FCEBC2 100%);
+            border-radius: 22px;
+            box-shadow: 0 8px 20px -6px rgba(245, 184, 65, 0.2), inset 0 2px 3px rgba(255,255,255,0.9);
+        }
+        .pastel-mint-card {
+            background: linear-gradient(145deg, #DEF7EC 0%, #CBF0E0 100%);
+            border-radius: 22px;
+            box-shadow: 0 8px 20px -6px rgba(62, 201, 142, 0.2), inset 0 2px 3px rgba(255,255,255,0.9);
+        }
+
+        /* 3D Squircle Icon Badges */
+        .icon-3d-blue {
+            background: linear-gradient(145deg, #63A6FF 0%, #3B82F6 100%);
+            box-shadow: 0 6px 14px -2px rgba(59, 130, 246, 0.45), inset 0 2px 3px rgba(255,255,255,0.6);
+        }
+        .icon-3d-pink {
+            background: linear-gradient(145deg, #FF85B1 0%, #EC4899 100%);
+            box-shadow: 0 6px 14px -2px rgba(236, 72, 153, 0.45), inset 0 2px 3px rgba(255,255,255,0.6);
+        }
+        .icon-3d-yellow {
+            background: linear-gradient(145deg, #FCD34D 0%, #F59E0B 100%);
+            box-shadow: 0 6px 14px -2px rgba(245, 158, 11, 0.45), inset 0 2px 3px rgba(255,255,255,0.6);
+        }
+        .icon-3d-mint {
+            background: linear-gradient(145deg, #5EEAD4 0%, #10B981 100%);
+            box-shadow: 0 6px 14px -2px rgba(16, 185, 129, 0.45), inset 0 2px 3px rgba(255,255,255,0.6);
+        }
+
+        /* Sidebar Navigation States */
+        .nav-pill-active {
+            background: var(--cream-canvas) !important;
+            color: #5D63D1 !important;
+            font-weight: 700 !important;
+            border-radius: 16px;
+            box-shadow:
+                0 6px 16px -3px rgba(45, 51, 135, 0.28),
+                inset 0 2px 3px rgba(255, 255, 255, 1);
+        }
+        .nav-pill-inactive {
+            color: rgba(255, 255, 255, 0.88);
+            border-radius: 16px;
+        }
+        .nav-pill-inactive:hover {
+            background: rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+        }
+
+        /* Sidebar Bottom Promo Card (matching "Go Premium" pastel peach card) */
+        .sidebar-promo-card {
+            background: linear-gradient(160deg, #FDD5D5 0%, #F9BDBD 100%);
+            border-radius: 22px;
+            box-shadow:
+                0 10px 20px -5px rgba(45, 51, 135, 0.35),
+                inset 0 2px 4px rgba(255, 255, 255, 0.85);
+            color: #1E1B4B;
+        }
+
+        /* Soft Tactile Inputs */
+        .clay-input {
+            background: #FFFFFF;
+            border: 1.5px solid #EAE4DC;
+            border-radius: 14px;
+            color: #1E1B4B;
+            box-shadow: inset 0 2px 4px rgba(101, 108, 214, 0.04);
+            transition: all 0.2s ease;
+        }
+        .clay-input:focus {
+            background: #FFFFFF;
+            border-color: #7C5CFA;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(124, 92, 250, 0.18);
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Markdown Styles */
+        .prose h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.45rem; font-weight: 800; margin-bottom: 1rem; margin-top: 1.5rem; color: #1E1B4B; }
+        .prose h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.2rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.6rem; color: #6E4DF2; border-bottom: 2px solid #EFE9FE; padding-bottom: 0.3rem; }
+        .prose h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.05rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #312E81; }
+        .prose p { margin-bottom: 0.75rem; line-height: 1.65; color: #334155; }
+        .prose ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; color: #334155; }
+        .prose ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1rem; color: #334155; }
+        .prose strong { font-weight: 600; color: #1E1B4B; }
+        .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.875rem; border-radius: 12px; overflow: hidden; }
+        .prose th, .prose td { border: 1px solid #E2D9F3; padding: 0.55rem; text-align: left; }
+        .prose th { background-color: #F3EEFF; font-weight: 700; color: #1E1B4B; }
+    </style>
+</head>
+<body>
+
+    <div id="app-wrapper">
+        
+        <!-- LOGIN SCREEN -->
+        <div id="login-screen" class="w-full h-full flex items-center justify-center absolute inset-0 z-50 bg-[#8E94F2]/60 backdrop-blur-md p-4">
+            <div class="clay-canvas w-full max-w-md p-8">
+                <div class="text-center mb-6">
+                    <!-- 3D Clay Emblem -->
+                    <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center mx-auto mb-4 shadow-lg border-4 border-[#EEF0FF]">
+                        <svg viewBox="0 0 64 64" class="w-12 h-12">
+                            <defs>
+                                <linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#8B6DFB"/>
+                                    <stop offset="100%" stop-color="#5B3FD9"/>
+                                </linearGradient>
+                                <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#FDE047"/>
+                                    <stop offset="100%" stop-color="#F59E0B"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M32 12L6 24L32 36L58 24L32 12Z" fill="url(#capGrad)"/>
+                            <path d="M16 30V42C16 46 23 50 32 50C41 50 48 46 48 42V30L32 37.5L16 30Z" fill="#7C5CFA" opacity="0.85"/>
+                            <circle cx="52" cy="26" r="2.5" fill="url(#goldGrad)"/>
+                            <path d="M52 28.5V39" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-[#1E1B4B] tracking-tight">SMADA GENERATOR</h2>
+                    <p class="text-slate-500 text-sm mt-1">Sistem Generator Modul Ajar Khusus Admin</p>
+                </div>
+                
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-[#1E1B4B] mb-1.5">Email Admin</label>
+                        <input type="email" id="login-email" required class="clay-input w-full px-4 py-2.5 text-sm" value="admin@smada.sch.id" placeholder="admin@smada.sch.id">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-[#1E1B4B] mb-1.5">Password</label>
+                        <input type="password" id="login-password" required class="clay-input w-full px-4 py-2.5 text-sm" value="smada2026" placeholder="••••••••">
+                    </div>
+                    <div id="login-error" class="hidden bg-rose-100 text-rose-700 p-3 rounded-xl text-sm text-center font-medium"></div>
+                    <button type="submit" id="btn-login" class="w-full clay-btn-primary font-bold py-3 text-sm mt-2">
+                        Masuk Sistem
+                    </button>
+                    <div id="preview-notice" class="text-center mt-3 hidden text-xs text-[#5D63D1] bg-[#EEF0FF] border border-[#D6DBFF] p-2.5 rounded-xl font-medium">
+                        <i class="fa-solid fa-sparkles mr-1"></i> Mode Preview Aktif: Klik <b>Masuk Sistem</b> langsung untuk mencoba.
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MAIN APP -->
+        <div id="main-app" class="hidden w-full h-full flex flex-col md:flex-row md:gap-4">
+            
+            <!-- DESKTOP CLAYMORHIC PERIWINKLE SIDEBAR -->
+            <nav class="hidden md:flex flex-col w-64 h-full clay-sidebar p-5 shrink-0 relative z-20">
+                <!-- Profile / Brand Header inside Sidebar -->
+                <div class="flex flex-col items-center text-center mb-6 pt-1">
+                    <div class="w-16 h-16 rounded-full bg-[#FAF6F0] flex items-center justify-center shadow-lg mb-3 border-2 border-white/80">
+                        <!-- 3D Clay Book & Sparkle Icon -->
+                        <svg viewBox="0 0 64 64" class="w-10 h-10">
+                            <defs>
+                                <linearGradient id="bookCover" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#FBBF24"/>
+                                    <stop offset="100%" stop-color="#F59E0B"/>
+                                </linearGradient>
+                                <linearGradient id="bookAccent" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#8B6DFB"/>
+                                    <stop offset="100%" stop-color="#6544E8"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="14" y="14" width="36" height="38" rx="7" fill="url(#bookCover)"/>
+                            <rect x="14" y="14" width="10" height="38" rx="4" fill="url(#bookAccent)"/>
+                            <rect x="28" y="22" width="16" height="4" rx="2" fill="#FFFBEB"/>
+                            <rect x="28" y="30" width="12" height="4" rx="2" fill="#FFFBEB" opacity="0.85"/>
+                        </svg>
+                    </div>
+                    <h1 class="font-extrabold text-white text-base tracking-tight leading-tight">SMADA GENERATOR</h1>
+                    <p class="text-xs text-indigo-100 mt-0.5 font-medium">Halo, Pendidik SMADA! 👋</p>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <div class="flex-1 space-y-2 overflow-y-auto no-scrollbar">
+                    <button onclick="navigate('dashboard')" class="nav-btn nav-pill-inactive w-full flex items-center gap-3 px-4 py-3 text-sm transition" data-target="dashboard">
+                        <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
+                    </button>
+                    <button onclick="navigate('generator')" class="nav-btn nav-pill-inactive w-full flex items-center gap-3 px-4 py-3 text-sm transition" data-target="generator">
+                        <i class="fa-solid fa-wand-magic-sparkles w-5 text-center"></i> Generator Modul
+                    </button>
+                    <button onclick="navigate('arsip')" class="nav-btn nav-pill-inactive w-full flex items-center justify-between px-4 py-3 text-sm transition" data-target="arsip">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-folder-open w-5 text-center"></i> Arsip Modul</span>
+                        <span id="sidebar-arsip-badge" class="bg-[#FF73A1] text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">0</span>
+                    </button>
+                    <button onclick="navigate('pengaturan')" class="nav-btn nav-pill-inactive w-full flex items-center gap-3 px-4 py-3 text-sm transition" data-target="pengaturan">
+                        <i class="fa-solid fa-gear w-5 text-center"></i> Pengaturan
+                    </button>
+                </div>
+
+                <!-- Bottom Pastel Promo / Info Card matching Reference -->
+                <div class="sidebar-promo-card p-4 text-center mt-4">
+                    <div class="w-10 h-10 mx-auto mb-1.5 flex items-center justify-center">
+                        <svg viewBox="0 0 48 48" class="w-9 h-9">
+                            <path d="M8 34L12 16L24 24L36 16L40 34H8Z" fill="#FBBF24" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/>
+                            <circle cx="12" cy="14" r="3" fill="#FDE047"/>
+                            <circle cx="24" cy="11" r="3.5" fill="#FDE047"/>
+                            <circle cx="36" cy="14" r="3" fill="#FDE047"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-extrabold text-sm text-[#1E1B4B]">Kurikulum Merdeka</h4>
+                    <p class="text-[11px] text-slate-700 leading-snug mt-0.5 mb-2.5">Susun Modul Ajar lengkap sesuai standar KEMENDIKDASMEN.</p>
+                    <button onclick="navigate('generator')" class="w-full py-1.5 rounded-full bg-[#F46B9B] hover:bg-[#E05284] text-white text-xs font-bold shadow-sm transition">
+                        Mulai Susun
+                    </button>
+                </div>
+
+                <button id="btn-logout" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl text-indigo-100 hover:bg-white/15 hover:text-white transition mt-3">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar Sistem
+                </button>
+            </nav>
+
+            <!-- MOBILE BOTTOM NAV -->
+            <nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#737AE3] border-t border-white/20 flex justify-around p-2 z-50 shadow-lg">
+                <button onclick="navigate('dashboard')" class="nav-btn-mobile flex flex-col items-center p-2 text-indigo-100 rounded-xl" data-target="dashboard">
+                    <i class="fa-solid fa-house text-lg mb-1"></i>
+                    <span class="text-[10px] font-semibold">Dashboard</span>
+                </button>
+                <button onclick="navigate('generator')" class="nav-btn-mobile flex flex-col items-center p-2 text-indigo-100 rounded-xl" data-target="generator">
+                    <i class="fa-solid fa-wand-magic-sparkles text-lg mb-1"></i>
+                    <span class="text-[10px] font-semibold">Generator</span>
+                </button>
+                <button onclick="navigate('arsip')" class="nav-btn-mobile flex flex-col items-center p-2 text-indigo-100 rounded-xl" data-target="arsip">
+                    <i class="fa-solid fa-folder-open text-lg mb-1"></i>
+                    <span class="text-[10px] font-semibold">Arsip</span>
+                </button>
+                <button onclick="navigate('pengaturan')" class="nav-btn-mobile flex flex-col items-center p-2 text-indigo-100 rounded-xl" data-target="pengaturan">
+                    <i class="fa-solid fa-gear text-lg mb-1"></i>
+                    <span class="text-[10px] font-semibold">Pengaturan</span>
+                </button>
+            </nav>
+
+            <!-- MAIN WARM CREAM CONTENT AREA -->
+            <main class="flex-1 h-full clay-canvas overflow-y-auto no-scrollbar p-4 md:p-7 pb-24 md:pb-7 relative z-10">
+                
+                <!-- TOP HEADER BAR (matching reference Dashboard top bar) -->
+                <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="md:hidden w-9 h-9 rounded-xl bg-[#7C5CFA] text-white flex items-center justify-center shadow">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h2 id="header-page-title" class="text-xl md:text-2xl font-extrabold text-[#1E1B4B] tracking-tight">Dashboard</h2>
+                            <p class="text-xs text-slate-500 md:hidden">SMADA GENERATOR • Modul Ajar</p>
+                        </div>
+                    </div>
+
+                    <!-- Pill Quick-Topic Search Bar -->
+                    <div class="hidden sm:flex items-center bg-white rounded-full px-4 py-2 shadow-sm border border-[#EDE7DF] w-72 lg:w-96">
+                        <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs mr-2.5"></i>
+                        <input type="text" id="quick-topic-input" placeholder="Ketik topik Modul Ajar lalu Enter..." class="bg-transparent text-xs text-[#1E1B4B] w-full focus:outline-none">
+                    </div>
+
+                    <!-- Top Right Tactile Action Icons -->
+                    <div class="flex items-center gap-2.5">
+                        <button onclick="navigate('arsip')" class="relative w-10 h-10 rounded-full bg-white shadow-sm border border-[#EDE7DF] flex items-center justify-center text-[#7C5CFA] hover:scale-105 transition" title="Lihat Arsip Modul Ajar">
+                            <i class="fa-solid fa-bell text-sm"></i>
+                            <span id="header-arsip-dot" class="absolute -top-1 -right-1 bg-[#F46B9B] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">0</span>
+                        </button>
+                        <button onclick="navigate('pengaturan')" class="w-10 h-10 rounded-full bg-gradient-to-br from-[#8B6DFB] to-[#6544E8] text-white shadow-md flex items-center justify-center hover:scale-105 transition" title="Identitas & Pengaturan">
+                            <i class="fa-solid fa-user text-sm"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="view-section space-y-6 hidden">
+                    
+                    <!-- HERO BANNER CARD (Pastel Pink-Lavender + 3D Clay Illustration) -->
+                    <div class="clay-hero p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                        <div class="max-w-lg z-10 text-center md:text-left">
+                            <span class="inline-block px-3 py-1 rounded-full bg-white/80 text-[#6E4DF2] text-xs font-bold mb-3 shadow-sm">
+                                ✨ SMADA GENERATOR AI
+                            </span>
+                            <h3 class="text-2xl md:text-3xl font-extrabold text-[#1E1B4B] leading-tight">
+                                Susun Modul Ajar Lebih Cepat & Terstruktur
+                            </h3>
+                            <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">
+                                Rancang perangkat pembelajaran Kurikulum Merdeka lengkap dengan KKTP, asesmen HOTS, dan LKPD dalam hitungan detik.
+                            </p>
+                            <div class="mt-5 flex flex-wrap justify-center md:justify-start gap-3">
+                                <button onclick="navigate('generator')" class="clay-btn-primary px-6 py-3 text-sm font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-plus"></i> Buat Modul Ajar
+                                </button>
+                                <button onclick="navigate('arsip')" class="px-5 py-3 rounded-full bg-white/90 hover:bg-white text-[#1E1B4B] text-sm font-bold shadow-sm transition">
+                                    Lihat Arsip
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Custom 3D Clay Educational Illustration SVG -->
+                        <div class="w-48 md:w-60 shrink-0 flex items-center justify-center">
+                            <svg viewBox="0 0 240 190" class="w-full h-auto drop-shadow-md">
+                                <defs>
+                                    <linearGradient id="deskPad" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#F9A8D4"/>
+                                        <stop offset="100%" stop-color="#F472B6"/>
+                                    </linearGradient>
+                                    <linearGradient id="book1" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#60A5FA"/>
+                                        <stop offset="100%" stop-color="#3B82F6"/>
+                                    </linearGradient>
+                                    <linearGradient id="book2" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#FBBF24"/>
+                                        <stop offset="100%" stop-color="#F59E0B"/>
+                                    </linearGradient>
+                                    <linearGradient id="book3" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#A78BFA"/>
+                                        <stop offset="100%" stop-color="#7C3AED"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Floating Sparkles -->
+                                <path d="M40 35L43 43L51 46L43 49L40 57L37 49L29 46L37 43Z" fill="#FBBF24"/>
+                                <path d="M198 28L200 34L206 36L200 38L198 44L196 38L190 36L196 34Z" fill="#FBBF24"/>
+                                <circle cx="182" cy="65" r="5" fill="#F472B6" opacity="0.6"/>
+                                <!-- Base Tray -->
+                                <rect x="45" y="130" width="150" height="32" rx="14" fill="url(#deskPad)"/>
+                                <rect x="52" y="124" width="136" height="12" rx="6" fill="#FBCFE8"/>
+                                <!-- 3D Vertical Books / Folders inside Tray -->
+                                <rect x="64" y="64" width="32" height="66" rx="10" transform="rotate(-8 64 64)" fill="url(#book2)"/>
+                                <rect x="102" y="54" width="34" height="74" rx="10" fill="url(#book3)"/>
+                                <rect x="142" y="62" width="32" height="66" rx="10" transform="rotate(7 142 62)" fill="url(#book1)"/>
+                                <!-- Cute Badge on Front -->
+                                <rect x="92" y="96" width="54" height="44" rx="12" fill="#FFFBEB"/>
+                                <path d="M119 125C119 125 107 117 107 110C107 106.5 109.8 104 113 104C115.2 104 117.3 105.2 119 107.2C120.7 105.2 122.8 104 125 104C128.2 104 131 106.5 131 110C131 117 119 125 119 125Z" fill="#F43F5E"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 4 PASTEL KPI CARDS (Blue, Pink, Yellow, Mint matching Reference) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+                        <!-- Card 1: Blue -->
+                        <div class="pastel-blue-card p-5">
+                            <div class="w-11 h-11 rounded-2xl icon-3d-blue text-white flex items-center justify-center text-lg mb-3">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-600">Total Modul Ajar</p>
+                            <h3 class="text-2xl font-extrabold text-[#1E1B4B] mt-0.5" id="stat-total-rpp">0</h3>
+                            <p class="text-[11px] font-semibold text-emerald-600 mt-1.5 flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-trend-up"></i> Tersimpan di arsip
+                            </p>
+                        </div>
+
+                        <!-- Card 2: Pink -->
+                        <div class="pastel-pink-card p-5">
+                            <div class="w-11 h-11 rounded-2xl icon-3d-pink text-white flex items-center justify-center text-lg mb-3">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-600">Status Mesin AI</p>
+                            <h3 class="text-base font-extrabold text-[#1E1B4B] mt-1 leading-snug" id="stat-api-status">Siap Digunakan</h3>
+                            <p class="text-[11px] font-semibold text-pink-600 mt-1.5 flex items-center gap-1">
+                                <i class="fa-solid fa-bolt"></i> Gemini 3 Flash
+                            </p>
+                        </div>
+
+                        <!-- Card 3: Yellow -->
+                        <div class="pastel-yellow-card p-5">
+                            <div class="w-11 h-11 rounded-2xl icon-3d-yellow text-white flex items-center justify-center text-lg mb-3">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-600">Cakupan Fase</p>
+                            <h3 class="text-2xl font-extrabold text-[#1E1B4B] mt-0.5">Fase A – F</h3>
+                            <p class="text-[11px] font-semibold text-amber-700 mt-1.5 flex items-center gap-1">
+                                <i class="fa-solid fa-check"></i> SD, SMP, SMA/SMK
+                            </p>
+                        </div>
+
+                        <!-- Card 4: Mint -->
+                        <div class="pastel-mint-card p-5">
+                            <div class="w-11 h-11 rounded-2xl icon-3d-mint text-white flex items-center justify-center text-lg mb-3">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-600">Standar Format</p>
+                            <h3 class="text-xl font-extrabold text-[#1E1B4B] mt-0.5">8 Dimensi</h3>
+                            <p class="text-[11px] font-semibold text-emerald-700 mt-1.5 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check"></i> Profil Lulusan & LKPD
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- RECENT MODUL AJAR LIST -->
+                    <div class="clay-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-extrabold text-[#1E1B4B]">Modul Ajar Terbaru</h3>
+                            <button onclick="navigate('arsip')" class="px-3.5 py-1.5 rounded-full bg-[#FAF6F0] hover:bg-[#EFE9FE] text-xs font-bold text-[#6E4DF2] border border-[#E5DEC9] transition">
+                                Lihat Semua
+                            </button>
+                        </div>
+                        <div id="dashboard-recent-list" class="space-y-3">
+                            <p class="text-slate-500 text-sm">Belum ada Modul Ajar yang dibuat.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GENERATOR VIEW -->
+                <div id="view-generator" class="view-section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- Form Input -->
+                        <div class="clay-card p-6 overflow-y-auto lg:max-h-[calc(100vh-140px)] no-scrollbar">
+                            <form id="generator-form" class="space-y-7">
+                                
+                                <!-- 1. Data Umum -->
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-xl icon-3d-blue text-white font-bold text-sm flex items-center justify-center">1</span>
+                                        <div>
+                                            <h3 class="text-base font-extrabold text-[#1E1B4B]">Data Umum Modul Ajar</h3>
+                                            <p class="text-xs text-slate-500">Informasi dasar identitas pembelajaran</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Mata Pelajaran <span class="text-rose-500">*</span></label>
+                                            <input type="text" id="gen-mapel" required class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Contoh: Matematika">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Jenjang <span class="text-rose-500">*</span></label>
+                                            <select id="gen-jenjang" required class="clay-input w-full px-3.5 py-2 text-sm">
+                                                <option value="" disabled selected>Pilih jenjang</option>
+                                                <option value="SD">SD / MI</option>
+                                                <option value="SMP">SMP / MTs</option>
+                                                <option value="SMA">SMA / MA</option>
+                                                <option value="SMK">SMK / MAK</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Kelas <span class="text-rose-500">*</span></label>
+                                            <input type="text" id="gen-kelas" required class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Contoh: X / 10">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Fase <span class="text-rose-500">*</span></label>
+                                            <select id="gen-fase" required class="clay-input w-full px-3.5 py-2 text-sm">
+                                                <option value="" disabled selected>Pilih fase</option>
+                                                <option value="A">Fase A (Kelas 1-2 SD)</option>
+                                                <option value="B">Fase B (Kelas 3-4 SD)</option>
+                                                <option value="C">Fase C (Kelas 5-6 SD)</option>
+                                                <option value="D">Fase D (Kelas 7-9 SMP)</option>
+                                                <option value="E">Fase E (Kelas 10 SMA/SMK)</option>
+                                                <option value="F">Fase F (Kelas 11-12 SMA/SMK)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Semester</label>
+                                            <select id="gen-semester" class="clay-input w-full px-3.5 py-2 text-sm">
+                                                <option value="" disabled selected>Pilih semester</option>
+                                                <option value="Ganjil">Ganjil</option>
+                                                <option value="Genap">Genap</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Tahun Pelajaran</label>
+                                            <input type="text" id="gen-tahun" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Contoh: 2026/2027">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Alokasi Waktu <span class="text-rose-500">*</span></label>
+                                            <input type="text" id="gen-durasi" required class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Contoh: 4 x 45 menit">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Jumlah Pertemuan</label>
+                                            <select id="gen-pertemuan" class="clay-input w-full px-3.5 py-2 text-sm mb-1">
+                                                <option value="1">1 Pertemuan</option>
+                                                <option value="2">2 Pertemuan</option>
+                                                <option value="3">3 Pertemuan</option>
+                                                <option value="4">4 Pertemuan</option>
+                                                <option value="5">5 Pertemuan</option>
+                                            </select>
+                                            <p class="text-[10px] text-slate-500">Maksimal 5 pertemuan agar proses AI stabil dan lengkap.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="border-[#EFE8DF]">
+
+                                <!-- 2. Desain Pembelajaran -->
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-xl icon-3d-pink text-white font-bold text-sm flex items-center justify-center">2</span>
+                                        <div>
+                                            <h3 class="text-base font-extrabold text-[#1E1B4B]">Desain Pembelajaran</h3>
+                                            <p class="text-xs text-slate-500">Strategi, topik, dan tujuan Modul Ajar</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Model Pembelajaran</label>
+                                            <select id="gen-model" class="clay-input w-full px-3.5 py-2 text-sm">
+                                                <option value="" disabled selected>Pilih model pembelajaran</option>
+                                                <option value="Problem Based Learning (PBL)">Problem Based Learning (PBL)</option>
+                                                <option value="Project Based Learning (PjBL)">Project Based Learning (PjBL)</option>
+                                                <option value="Discovery Learning">Discovery Learning</option>
+                                                <option value="Inquiry Learning">Inquiry Learning</option>
+                                                <option value="Cooperative Learning">Cooperative Learning</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Pendekatan Khusus</label>
+                                            <select id="gen-pendekatan" class="clay-input w-full px-3.5 py-2 text-sm">
+                                                <option value="Standar">Standar (tanpa pendekatan khusus)</option>
+                                                <option value="TaRL">Teaching at the Right Level (TaRL)</option>
+                                                <option value="CRT">Culturally Responsive Teaching (CRT)</option>
+                                                <option value="Berdiferensiasi">Pembelajaran Berdiferensiasi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Materi Pokok / Topik Utama <span class="text-rose-500">*</span></label>
+                                        <input type="text" id="gen-topik" required class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Contoh: Eksponen dan Logaritma dalam Kehidupan Sehari-hari">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Tujuan Pembelajaran <span class="text-rose-500">*</span></label>
+                                        <textarea id="gen-tujuan" required rows="3" class="clay-input w-full px-3.5 py-2 text-sm resize-none" placeholder="Tuliskan tujuan pembelajaran yang ingin dicapai secara mendetail..."></textarea>
+                                    </div>
+                                </div>
+
+                                <hr class="border-[#EFE8DF]">
+
+                                <!-- 3. Dimensi Profil Lulusan -->
+                                <div class="space-y-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-8 h-8 rounded-xl icon-3d-yellow text-white font-bold text-sm flex items-center justify-center">3</span>
+                                            <div>
+                                                <h3 class="text-base font-extrabold text-[#1E1B4B]">Dimensi Profil Lulusan <span class="text-rose-500">*</span></h3>
+                                                <p class="text-xs text-slate-500">Pilih minimal 4 dari 8 dimensi</p>
+                                            </div>
+                                        </div>
+                                        <span id="dpl-counter" class="text-xs font-bold bg-[#F46B9B] text-white px-3 py-1 rounded-full shadow-sm">0/8 dipilih (min. 4)</span>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5" id="dpl-container">
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Keimanan dan Ketakwaan" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Keimanan & Ketakwaan</span><span class="text-slate-500">Beriman kepada Tuhan YME</span></div>
+                                        </label>
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Kewargaan" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Kewargaan</span><span class="text-slate-500">Berkebinekaan global</span></div>
+                                        </label>
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Penalaran Kritis" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Penalaran Kritis</span><span class="text-slate-500">Berpikir logis & analitis</span></div>
+                                        </label>
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Kreativitas" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Kreativitas</span><span class="text-slate-500">Karya inovatif</span></div>
+                                        </label>
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Kolaborasi" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Kolaborasi</span><span class="text-slate-500">Kerja sama tim</span></div>
+                                        </label>
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Kemandirian" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Kemandirian</span><span class="text-slate-500">Belajar mandiri</span></div>
+                                        </label>
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Kesehatan" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Kesehatan</span><span class="text-slate-500">Fisik dan mental</span></div>
+                                        </label>
+                                        <label class="flex items-start p-3 bg-[#FAF6F0] border border-[#EBE3D7] rounded-2xl cursor-pointer hover:border-[#7C5CFA] transition">
+                                            <div class="flex items-center h-5"><input type="checkbox" value="Komunikasi" class="w-4 h-4 accent-[#7C5CFA] rounded dpl-checkbox"></div>
+                                            <div class="ms-2.5 text-xs"><span class="font-bold text-[#1E1B4B] block">Komunikasi</span><span class="text-slate-500">Secara efektif</span></div>
+                                        </label>
+                                    </div>
+                                    <p id="dpl-error" class="hidden text-xs text-rose-600 font-semibold">Pilih minimal 4 dimensi untuk melanjutkan.</p>
+                                </div>
+
+                                <button type="submit" id="btn-generate" class="w-full clay-btn-primary font-bold py-3.5 text-sm flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Modul Ajar Sekarang
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Result Area -->
+                        <div class="clay-card p-6 flex flex-col min-h-[450px] lg:h-[calc(100vh-140px)]">
+                            <div class="flex flex-wrap justify-between items-center gap-2 mb-4 pb-4 border-b border-[#EFE8DF] shrink-0">
+                                <h3 class="text-base font-extrabold text-[#1E1B4B]">Hasil Modul Ajar</h3>
+                                <div id="result-actions" class="hidden flex-wrap gap-2">
+                                    <button onclick="copyResult()" class="px-3.5 py-1.5 bg-[#FAF6F0] hover:bg-[#EFE9FE] text-[#1E1B4B] border border-[#E5DEC9] rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                        <i class="fa-regular fa-copy"></i> Salin
+                                    </button>
+                                    <button onclick="printModulAjar('current')" class="px-3.5 py-1.5 bg-[#FCE1E8] hover:bg-[#FAD0DC] text-[#BE185D] rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                                        <i class="fa-solid fa-print"></i> Cetak
+                                    </button>
+                                    <button onclick="saveResult()" class="px-4 py-1.5 bg-[#10B981] hover:bg-[#059669] text-white rounded-full text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+                                        <i class="fa-solid fa-floppy-disk"></i> Simpan Arsip
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="generator-loader" class="hidden flex-1 flex flex-col items-center justify-center text-center p-4">
+                                <div class="w-16 h-16 rounded-2xl bg-[#EFE9FE] text-[#7C5CFA] flex items-center justify-center text-2xl mb-4 shadow-inner">
+                                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                                </div>
+                                <p class="text-sm font-bold text-[#6E4DF2] animate-pulse">Menyusun Modul Ajar super detail...</p>
+                                <p class="text-xs text-slate-400 mt-1">Mohon tunggu, proses penyusunan memakan waktu 15–30 detik.</p>
+                            </div>
+
+                            <div id="generator-empty" class="flex-1 flex flex-col items-center justify-center text-slate-400 text-center p-6">
+                                <div class="w-20 h-20 rounded-3xl bg-[#FAF6F0] border border-[#EDE7DF] flex items-center justify-center text-3xl text-[#8B6DFB] mb-3 shadow-sm">
+                                    <i class="fa-solid fa-file-signature"></i>
+                                </div>
+                                <p class="text-sm font-bold text-[#1E1B4B]">Dokumen Modul Ajar akan muncul di sini</p>
+                                <p class="text-xs text-slate-500 mt-1 max-w-xs">Lengkapi formulir di samping lalu klik <b>Generate Modul Ajar Sekarang</b>.</p>
+                            </div>
+
+                            <div id="generator-result" class="flex-1 overflow-y-auto no-scrollbar prose prose-sm max-w-none pb-8 hidden">
+                                <!-- Markdown content injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ARSIP VIEW -->
+                <div id="view-arsip" class="view-section hidden h-full flex flex-col">
+                    <div id="arsip-empty" class="flex-1 flex flex-col items-center justify-center text-slate-400 clay-card p-8 text-center">
+                        <div class="w-20 h-20 rounded-3xl bg-[#FCE1E8] text-[#F46B9B] flex items-center justify-center text-3xl mb-3 shadow-sm">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <p class="text-base font-extrabold text-[#1E1B4B]">Belum ada arsip Modul Ajar yang disimpan</p>
+                        <p class="text-xs text-slate-500 mt-1 mb-4">Buat Modul Ajar pertama Anda sekarang dan simpan ke arsip.</p>
+                        <button onclick="navigate('generator')" class="clay-btn-primary px-5 py-2.5 text-xs font-bold">
+                            + Buat Modul Ajar
+                        </button>
+                    </div>
+                    <div id="arsip-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 hidden pb-10">
+                        <!-- Cards Injected Here -->
+                    </div>
+                </div>
+
+                <!-- PENGATURAN VIEW -->
+                <div id="view-pengaturan" class="view-section hidden h-full">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
+                        <!-- API Key Card -->
+                        <div class="clay-card p-6 h-fit">
+                            <div class="flex items-center gap-3 mb-4 pb-3 border-b border-[#EFE8DF]">
+                                <span class="w-9 h-9 rounded-xl icon-3d-blue text-white flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-key"></i>
+                                </span>
+                                <div>
+                                    <h3 class="text-base font-extrabold text-[#1E1B4B]">Konfigurasi API Gemini</h3>
+                                    <p class="text-xs text-slate-500">Kunci akses kecerdasan buatan</p>
+                                </div>
+                            </div>
+                            <form id="form-settings" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">Gemini API Key (Opsional di Mode Preview)</label>
+                                    <input type="password" id="input-api-key" class="clay-input w-full px-4 py-2.5 text-sm" placeholder="AIzaSy... (Kosongkan untuk kunci bawaan Preview)">
+                                    <p class="text-xs text-slate-500 mt-1.5">Dapatkan API key gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[#6E4DF2] font-semibold hover:underline">Google AI Studio</a> jika ingin memakai kunci pribadi.</p>
+                                </div>
+                                <button type="submit" id="btn-save-settings" class="w-full clay-btn-primary font-bold py-2.5 text-sm">Simpan API Key</button>
+                            </form>
+                        </div>
+
+                        <!-- Identitas Sekolah Card -->
+                        <div class="clay-card p-6">
+                            <div class="flex items-center gap-3 mb-4 pb-3 border-b border-[#EFE8DF]">
+                                <span class="w-9 h-9 rounded-xl icon-3d-pink text-white flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-school"></i>
+                                </span>
+                                <div>
+                                    <h3 class="text-base font-extrabold text-[#1E1B4B]">Identitas Sekolah & Cetak</h3>
+                                    <p class="text-xs text-slate-500">Otomatis tampil di sampul & kop Modul Ajar</p>
+                                </div>
+                            </div>
+                            <form id="form-identitas" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-[#1E1B4B] mb-1.5">URL Logo Sekolah (Opsional)</label>
+                                    <input type="url" id="set-logo" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="https://contoh.com/logo.png">
+                                    <p class="text-[10px] text-slate-500 mt-1">Gunakan tautan gambar langsung (.png/.jpg). Jika kosong, logo tidak dicetak.</p>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                    <div class="col-span-1 md:col-span-2">
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">Nama Sekolah</label>
+                                        <input type="text" id="set-sekolah" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Misal: SMA Negeri 2 Malang">
+                                    </div>
+                                    <div class="col-span-1 md:col-span-2">
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">Alamat Sekolah</label>
+                                        <input type="text" id="set-alamat" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Misal: Jl. Laksamana Martadinata No. 84">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">Nama Kepala Sekolah</label>
+                                        <input type="text" id="set-kepsek" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Nama Kepala Sekolah">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">NIP Kepala Sekolah</label>
+                                        <input type="text" id="set-nip-kepsek" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="NIP Kepsek">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">Nama Guru Penyusun</label>
+                                        <input type="text" id="set-guru" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Nama Anda">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">NIP Guru</label>
+                                        <input type="text" id="set-nip-guru" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="NIP Anda">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">Tempat Tanda Tangan</label>
+                                        <input type="text" id="set-tempat-ttd" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Misal: Malang">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#1E1B4B] mb-1">Tanggal Tanda Tangan</label>
+                                        <input type="text" id="set-tanggal-ttd" class="clay-input w-full px-3.5 py-2 text-sm" placeholder="Misal: 24 November 2026">
+                                    </div>
+                                </div>
+                                <button type="submit" id="btn-save-identitas" class="w-full clay-btn-primary font-bold py-2.5 text-sm mt-2">Simpan Identitas</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- MODUL AJAR VIEWER MODAL -->
+        <div id="modal-view" class="fixed inset-0 z-[99999] bg-[#1E1B4B]/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+            <div class="clay-canvas w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+                <div class="p-4 md:px-6 border-b border-[#EFE8DF] flex justify-between items-center bg-white">
+                    <h3 id="modal-title" class="font-extrabold text-[#1E1B4B] text-base md:text-lg">Detail Modul Ajar</h3>
+                    <div class="flex items-center gap-2">
+                        <button onclick="printModulAjar('modal')" class="px-3.5 py-1.5 bg-[#FCE1E8] hover:bg-[#FAD0DC] text-[#BE185D] rounded-full text-xs font-bold transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-print"></i> Cetak
+                        </button>
+                        <button onclick="copyModalContent()" class="w-9 h-9 rounded-full bg-[#FAF6F0] hover:bg-[#EFE9FE] text-slate-600 hover:text-[#6E4DF2] flex items-center justify-center transition" title="Salin teks">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                        <button onclick="closeModal()" class="w-9 h-9 rounded-full bg-[#FAF6F0] hover:bg-rose-100 text-slate-600 hover:text-rose-600 flex items-center justify-center transition" title="Tutup">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="modal-content" class="p-6 overflow-y-auto prose prose-sm max-w-none flex-1 bg-[#FFFDF9]"></div>
+            </div>
+        </div>
+
+        <!-- GLOBAL TOAST NOTIFICATION -->
+        <div id="toast" class="fixed top-5 right-5 z-[999999] transform transition-all duration-300 translate-x-full opacity-0 flex items-center p-3.5 text-[#1E1B4B] bg-white rounded-2xl shadow-xl border border-[#EFE8DF]" role="alert">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-xl bg-[#FAF6F0]">
+                <i class="fa-solid fa-check-circle text-emerald-500 text-lg" id="toast-icon"></i>
+            </div>
+            <div class="ms-3 text-xs font-bold mr-2" id="toast-message">Pesan notifikasi</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==========================================
+        // KONFIGURASI APLIKASI SMADA GENERATOR
+        // ==========================================
+        const IS_PREVIEW = true; // Set FALSE jika memakai Firebase sungguhan
+
+        const firebaseConfig = {
+              apiKey: "AIzaSyC4EKCM1wMzAz3VFYGkcPtpAEQFMFL6JcI",
+  authDomain: "smada-ce54f.firebaseapp.com",
+  projectId: "smada-ce54f",
+  storageBucket: "smada-ce54f.firebasestorage.app",
+  messagingSenderId: "276773577790",
+  appId: "1:276773577790:web:1603c052c2f5cd93501d6f"
+        };
+
+        let app, auth, db;
+        let mockData = {
+            arsip: [],
+            apiKey: "",
+            identitas: {
+                nama_sekolah: "SMA Negeri 2 Malang",
+                alamat: "Jl. Laksamana Martadinata No. 84, Kota Malang",
+                nama_kepsek: "Drs. H. Ahmad Fauzi, M.Pd.",
+                nip_kepsek: "19690415 199512 1 002",
+                nama_guru: "Dewi Kartika, S.Pd., Gr.",
+                nip_guru: "19890721 201403 2 005",
+                logo: "",
+                tempat_ttd: "Malang",
+                tanggal_ttd: "24 November 2026"
+            }
+        };
+        let currentGeneratedModul = null;
+        let currentGeneratedMeta = null;
+        let modalRawContent = null;
+
+        if (!IS_PREVIEW) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } else {
+            document.getElementById('preview-notice').classList.remove('hidden');
+        }
+
+        // Quick-topic search bar shortcut in header
+        const quickTopicInput = document.getElementById('quick-topic-input');
+        if (quickTopicInput) {
+            quickTopicInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && quickTopicInput.value.trim()) {
+                    const val = quickTopicInput.value.trim();
+                    quickTopicInput.value = '';
+                    navigate('generator');
+                    document.getElementById('gen-topik').value = val;
+                    document.getElementById('gen-topik').focus();
+                }
+            });
+        }
+
+        // Safe clipboard copy for iframe/sandbox
+        function copyToClipboardSafe(text, successMsg) {
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.top = "-9999px";
+                textArea.style.left = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (successful) {
+                    showToast(successMsg, "success");
+                    return;
+                }
+            } catch (err) {}
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showToast(successMsg, "success"))
+                    .catch(() => showToast("Gagal menyalin teks", "error"));
+            } else {
+                showToast("Browser tidak mendukung salin otomatis", "error");
+            }
+        }
+
+        // Exponential Backoff for Gemini API
+        async function fetchWithRetry(url, options, maxRetries = 4) {
+            let delay = 1000;
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 429 || response.status >= 500) {
+                        if (attempt === maxRetries) return response;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    return response;
+                } catch (err) {
+                    if (attempt === maxRetries) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        const pageTitles = {
+            dashboard: 'Dashboard',
+            generator: 'Generator Modul Ajar',
+            arsip: 'Arsip Modul Ajar',
+            pengaturan: 'Pengaturan Sistem'
+        };
+
+        window.navigate = function(targetId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + targetId).classList.remove('hidden');
+            
+            const headerTitle = document.getElementById('header-page-title');
+            if (headerTitle) headerTitle.innerText = pageTitles[targetId] || 'Dashboard';
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === targetId) {
+                    btn.classList.add('nav-pill-active');
+                    btn.classList.remove('nav-pill-inactive');
+                } else {
+                    btn.classList.remove('nav-pill-active');
+                    btn.classList.add('nav-pill-inactive');
+                }
+            });
+
+            document.querySelectorAll('.nav-btn-mobile').forEach(btn => {
+                if(btn.dataset.target === targetId) {
+                    btn.classList.add('bg-[#FAF6F0]', 'text-[#5D63D1]');
+                    btn.classList.remove('text-indigo-100');
+                } else {
+                    btn.classList.remove('bg-[#FAF6F0]', 'text-[#5D63D1]');
+                    btn.classList.add('text-indigo-100');
+                }
+            });
+
+            if(targetId === 'dashboard') loadDashboard();
+            if(targetId === 'arsip') loadArsip();
+            if(targetId === 'pengaturan') loadSettings();
+        };
+
+        window.showToast = function(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            
+            let icon = document.getElementById('toast-icon');
+            icon.className = '';
+            if(type === 'success') icon.className = 'fa-solid fa-check-circle text-emerald-500 text-lg';
+            else if(type === 'error') icon.className = 'fa-solid fa-circle-exclamation text-rose-500 text-lg';
+            else icon.className = 'fa-solid fa-info-circle text-[#7C5CFA] text-lg';
+
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+            }, 3200);
+        };
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            const btn = document.getElementById('btn-login');
+            const err = document.getElementById('login-error');
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+            btn.disabled = true;
+            err.classList.add('hidden');
+
+            if (IS_PREVIEW) {
+                setTimeout(() => {
+                    btn.innerHTML = 'Masuk Sistem';
+                    btn.disabled = false;
+                    initAppSetup();
+                }, 450);
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (error) {
+                err.innerText = "Gagal login. Periksa email dan password.";
+                err.classList.remove('hidden');
+                btn.innerHTML = 'Masuk Sistem';
+                btn.disabled = false;
+            }
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            if(IS_PREVIEW) {
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+            } else {
+                await signOut(auth);
+            }
+        });
+
+        if (!IS_PREVIEW) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    initAppSetup();
+                } else {
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('main-app').classList.add('hidden');
+                }
+            });
+        }
+
+        async function initAppSetup() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            if(!IS_PREVIEW) {
+                await autoSetupDatabase();
+            }
+            navigate('dashboard');
+        }
+
+        async function autoSetupDatabase() {
+            try {
+                const settingsRef = doc(db, "pengaturan", "konfigurasi_sistem");
+                const identitasRef = doc(db, "pengaturan", "identitas_sekolah");
+                
+                const docSnap = await getDoc(settingsRef);
+                if (!docSnap.exists()) {
+                    await setDoc(settingsRef, { gemini_api_key: "", created_at: serverTimestamp() });
+                }
+                const idSnap = await getDoc(identitasRef);
+                if (!idSnap.exists()) {
+                    await setDoc(identitasRef, { nama_sekolah: "", alamat: "", nama_kepsek: "", nip_kepsek: "", nama_guru: "", nip_guru: "", logo: "", tempat_ttd: "", tanggal_ttd: "" });
+                }
+            } catch (e) {}
+        }
+
+        async function getGeminiKey() {
+            if (IS_PREVIEW) return mockData.apiKey || "";
+            try {
+                const docSnap = await getDoc(doc(db, "pengaturan", "konfigurasi_sistem"));
+                if (docSnap.exists()) return docSnap.data().gemini_api_key || "";
+            } catch(e) {}
+            return "";
+        }
+
+        async function getIdentitas() {
+            if (IS_PREVIEW) return mockData.identitas || {};
+            try {
+                const docSnap = await getDoc(doc(db, "pengaturan", "identitas_sekolah"));
+                if (docSnap.exists()) return docSnap.data();
+            } catch(e) {}
+            return {};
+        }
+
+        document.getElementById('form-identitas').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-identitas');
+            btn.disabled = true; btn.innerText = "Menyimpan...";
+            
+            const payload = {
+                nama_sekolah: document.getElementById('set-sekolah').value.trim(),
+                alamat: document.getElementById('set-alamat').value.trim(),
+                nama_kepsek: document.getElementById('set-kepsek').value.trim(),
+                nip_kepsek: document.getElementById('set-nip-kepsek').value.trim(),
+                nama_guru: document.getElementById('set-guru').value.trim(),
+                nip_guru: document.getElementById('set-nip-guru').value.trim(),
+                logo: document.getElementById('set-logo').value.trim(),
+                tempat_ttd: document.getElementById('set-tempat-ttd').value.trim(),
+                tanggal_ttd: document.getElementById('set-tanggal-ttd').value.trim()
+            };
+            
+            if (IS_PREVIEW) {
+                mockData.identitas = payload; 
+                finishSave("Identitas berhasil disimpan!");
+            } else {
+                try {
+                    await setDoc(doc(db, "pengaturan", "identitas_sekolah"), payload, { merge: true });
+                    finishSave("Identitas berhasil disimpan!");
+                } catch(err) { showToast("Gagal menyimpan identitas", "error"); btn.disabled = false; btn.innerText = "Simpan Identitas"; }
+            }
+            function finishSave(msg) { showToast(msg, "success"); btn.disabled = false; btn.innerText = "Simpan Identitas"; }
+        });
+
+        document.getElementById('form-settings').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const val = document.getElementById('input-api-key').value.trim();
+            const btn = document.getElementById('btn-save-settings');
+            btn.disabled = true; btn.innerText = "Menyimpan...";
+            if (IS_PREVIEW) {
+                mockData.apiKey = val;
+                finishSave("API Key berhasil disimpan");
+            } else {
+                try {
+                    await setDoc(doc(db, "pengaturan", "konfigurasi_sistem"), { gemini_api_key: val }, { merge: true });
+                    finishSave("API Key berhasil disimpan");
+                } catch(err) { showToast("Gagal menyimpan", "error"); btn.disabled = false; btn.innerText = "Simpan API Key"; }
+            }
+            function finishSave(msg) { showToast(msg, "success"); btn.disabled = false; btn.innerText = "Simpan API Key"; }
+        });
+
+        async function loadSettings() {
+            const key = await getGeminiKey();
+            document.getElementById('input-api-key').value = key;
+            const identitas = await getIdentitas();
+            if(identitas) {
+                document.getElementById('set-sekolah').value = identitas.nama_sekolah || '';
+                document.getElementById('set-alamat').value = identitas.alamat || '';
+                document.getElementById('set-kepsek').value = identitas.nama_kepsek || '';
+                document.getElementById('set-nip-kepsek').value = identitas.nip_kepsek || '';
+                document.getElementById('set-guru').value = identitas.nama_guru || '';
+                document.getElementById('set-nip-guru').value = identitas.nip_guru || '';
+                document.getElementById('set-logo').value = identitas.logo || '';
+                document.getElementById('set-tempat-ttd').value = identitas.tempat_ttd || '';
+                document.getElementById('set-tanggal-ttd').value = identitas.tanggal_ttd || '';
+            }
+        }
+
+        function updateBadges(count) {
+            const sbBadge = document.getElementById('sidebar-arsip-badge');
+            const hdDot = document.getElementById('header-arsip-dot');
+            if (sbBadge) sbBadge.innerText = count;
+            if (hdDot) hdDot.innerText = count;
+        }
+
+        async function loadDashboard() {
+            let dataList = [];
+            const key = await getGeminiKey();
+            const apiStat = document.getElementById('stat-api-status');
+            if(key && key.length > 10) {
+                apiStat.innerText = "Terkonfigurasi";
+            } else if (IS_PREVIEW) {
+                apiStat.innerText = "Aktif (Preview)";
+            } else {
+                apiStat.innerText = "Belum Diatur";
+            }
+
+            if(IS_PREVIEW) {
+                dataList = [...mockData.arsip].reverse();
+            } else {
+                try {
+                    const q = query(collection(db, "arsip_modul_ajar"), orderBy("dibuat_pada", "desc"));
+                    const querySnapshot = await getDocs(q);
+                    querySnapshot.forEach((doc) => { dataList.push({ id: doc.id, ...doc.data() }); });
+                } catch(e) {}
+            }
+
+            updateBadges(dataList.length);
+            document.getElementById('stat-total-rpp').innerText = dataList.length;
+            const listEl = document.getElementById('dashboard-recent-list');
+            listEl.innerHTML = '';
+            
+            if(dataList.length === 0) {
+                listEl.innerHTML = '<p class="text-slate-500 text-sm">Belum ada Modul Ajar yang dibuat. Klik <b>Buat Modul Ajar</b> untuk memulai.</p>';
+            } else {
+                dataList.slice(0, 4).forEach((item, idx) => {
+                    listEl.innerHTML += `
+                        <div class="p-3.5 border border-[#EFE8DF] rounded-2xl bg-[#FAF6F0]/70 flex justify-between items-center gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-[#EFE9FE] text-[#6E4DF2] flex items-center justify-center font-bold shrink-0">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-[#1E1B4B] truncate">${item.mata_pelajaran} • Kelas ${item.kelas}</h4>
+                                    <p class="text-xs text-slate-500 truncate">${item.topik}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold bg-[#DEF7EC] text-emerald-700 px-3 py-1 rounded-full shrink-0">Tersimpan</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        window.currentArchiveData = []; 
+
+        async function loadArsip() {
+            let dataList = [];
+            if(IS_PREVIEW) {
+                dataList = [...mockData.arsip].reverse();
+            } else {
+                try {
+                    const q = query(collection(db, "arsip_modul_ajar"), orderBy("dibuat_pada", "desc"));
+                    const querySnapshot = await getDocs(q);
+                    querySnapshot.forEach((doc) => { dataList.push({ id: doc.id, ...doc.data() }); });
+                } catch(e) {}
+            }
+
+            window.currentArchiveData = dataList; 
+            updateBadges(dataList.length);
+
+            const container = document.getElementById('arsip-container');
+            const emptyEl = document.getElementById('arsip-empty');
+            
+            container.innerHTML = '';
+            if(dataList.length === 0) {
+                container.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+            } else {
+                container.classList.remove('hidden');
+                emptyEl.classList.add('hidden');
+                
+                dataList.forEach((item, index) => {
+                    let displayTitle = `${item.mata_pelajaran} - Kelas ${item.kelas}`;
+                    
+                    container.innerHTML += `
+                        <div class="clay-card p-5 flex flex-col justify-between hover:shadow-lg transition">
+                            <div>
+                                <div class="flex justify-between items-start gap-2 mb-2.5">
+                                    <h4 class="font-extrabold text-[#1E1B4B] line-clamp-1">${displayTitle}</h4>
+                                    <span class="text-[11px] bg-[#EFE9FE] text-[#6E4DF2] px-2.5 py-0.5 rounded-full font-bold shrink-0">Fase ${item.fase || '-'}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed">${item.topik}</p>
+                            </div>
+                            <button onclick="viewModal(${index})" class="w-full py-2.5 bg-[#FAF6F0] hover:bg-[#7C5CFA] text-[#6E4DF2] hover:text-white border border-[#E5DEC9] rounded-xl text-xs font-bold transition">
+                                Buka Modul Ajar
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        window.viewModal = function(index) {
+            const item = window.currentArchiveData[index];
+            if(!item) return;
+
+            const content = item.konten_modul;
+            const title = `Modul Ajar: ${item.mata_pelajaran} - Kelas ${item.kelas}`;
+
+            modalRawContent = content; 
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-content').innerHTML = marked.parse(content);
+            document.getElementById('modal-view').classList.remove('hidden');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('modal-view').classList.add('hidden');
+            modalRawContent = null;
+        };
+
+        window.copyModalContent = function() {
+            const content = document.getElementById('modal-content').innerText;
+            copyToClipboardSafe(content, "Isi Modul Ajar berhasil disalin");
+        };
+        
+        window.copyResult = function() {
+            if(currentGeneratedModul) {
+                copyToClipboardSafe(currentGeneratedModul, "Markdown Modul Ajar berhasil disalin");
+            }
+        };
+
+        window.printModulAjar = async function(mode) {
+            const rawContent = mode === 'current' ? currentGeneratedModul : modalRawContent;
+            if(!rawContent) { showToast("Tidak ada konten Modul Ajar untuk dicetak.", "error"); return; }
+            
+            showToast("Menyiapkan dokumen cetak Modul Ajar...", "info");
+            const identitas = await getIdentitas();
+            let htmlContent = marked.parse(rawContent);
+
+            const extractMeta = (label, text) => {
+                const regex = new RegExp(`\\*\\s*${label}:\\s*(.*?)(?:\\n|$)`, 'i');
+                const match = text.match(regex);
+                return match && match[1] ? match[1].replace(/\*\*/g, '').trim() : '.......................';
+            };
+
+            const mapel = extractMeta('Mata Pelajaran', rawContent);
+            const topik = extractMeta('Materi Pokok \\/ Topik', rawContent);
+            const kelas = extractMeta('Kelas \\/ Fase', rawContent);
+            const semester = extractMeta('Semester', rawContent);
+            const tahun = extractMeta('Tahun Pelajaran', rawContent);
+            const alokasi = extractMeta('Alokasi Waktu', rawContent);
+            const pertemuan = extractMeta('Jumlah Pertemuan', rawContent);
+            
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const d = new Date(); 
+            const fallbackDate = `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            
+            const ttdTempat = identitas.tempat_ttd || '...................';
+            const ttdTanggal = identitas.tanggal_ttd || fallbackDate;
+
+            const signatureHtml = `
+                <div class="ttd-container">
+                    <div class="ttd-box">
+                        <p>Mengetahui,<br>Kepala Sekolah</p>
+                        <div class="ttd-space"></div>
+                        <p class="ttd-nama">${identitas.nama_kepsek || '(................................)'}</p>
+                        <p>NIP. ${identitas.nip_kepsek || '....................'}</p>
+                    </div>
+                    <div class="ttd-box">
+                        <p>${ttdTempat}, ${ttdTanggal}<br>Guru Mata Pelajaran</p>
+                        <div class="ttd-space"></div>
+                        <p class="ttd-nama">${identitas.nama_guru || '(................................)'}</p>
+                        <p>NIP. ${identitas.nip_guru || '....................'}</p>
+                    </div>
+                </div>
+            `;
+
+            const lampiran1Regex = /(<h[1-3][^>]*>LAMPIRAN\s*1[^<]*<\/h[1-3]>)/i;
+            if (lampiran1Regex.test(htmlContent)) {
+                htmlContent = htmlContent.replace(lampiran1Regex, signatureHtml + '\n<div class="page-break"></div>\n$1');
+            } else {
+                htmlContent = htmlContent + signatureHtml;
+            }
+
+            htmlContent = htmlContent.replace(/(<h[1-3][^>]*>LAMPIRAN\s*[2-9][^<]*<\/h[1-3]>)/gi, '\n<div class="page-break"></div>\n$1');
+
+            const coverTitle = "MODUL AJAR <br> KURIKULUM MERDEKA";
+            const coverLogo = identitas.logo ? `<img src="${identitas.logo}" class="cover-logo">` : '';
+            const coverHtml = `
+                <div class="cover-page">
+                    ${coverLogo}
+                    <h1>${coverTitle}</h1>
+                    
+                    <div class="cover-mata-pelajaran">
+                        <h2>Mata Pelajaran: ${mapel}</h2>
+                        <p>Materi Pokok: ${topik}</p>
+                    </div>
+
+                    <div class="cover-info-table">
+                        <table>
+                            <tr><td>Kelas / Fase</td><td>: ${kelas}</td></tr>
+                            <tr><td>Semester</td><td>: ${semester}</td></tr>
+                            <tr><td>Tahun Pelajaran</td><td>: ${tahun}</td></tr>
+                            <tr><td>Alokasi Waktu</td><td>: ${alokasi}</td></tr>
+                            <tr><td>Pertemuan</td><td>: ${pertemuan}</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="cover-details">
+                        <p><strong>Penyusun:</strong><br>${identitas.nama_guru || '................................'}</p>
+                        <p><strong>Sekolah:</strong><br>${identitas.nama_sekolah || '................................'}</p>
+                    </div>
+                </div>
+            `;
+            
+            const printDocHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Cetak Modul Ajar - SMADA GENERATOR</title>
+                    <style>
+                        @page { size: A4; margin: 2cm; }
+                        body { font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.5; color: #000; }
+                        .cover-page { height: 95vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; page-break-after: always; }
+                        .cover-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 24px; }
+                        .cover-page h1 { font-size: 22pt; margin-bottom: 32px; line-height: 1.5; font-weight: bold; }
+                        .cover-mata-pelajaran { margin-bottom: 24px; }
+                        .cover-mata-pelajaran h2 { font-size: 15pt; margin-bottom: 5px; text-transform: uppercase; border: none; padding: 0;}
+                        .cover-mata-pelajaran p { font-size: 13pt; font-weight: bold; margin: 0; }
+                        .cover-info-table { margin: 0 auto 40px auto; width: 70%; font-size: 13pt; text-align: left; }
+                        .cover-info-table table { border: none; margin-top: 0; margin-bottom: 0; box-shadow: none; }
+                        .cover-info-table td { border: none; padding: 4px 8px; font-weight: bold; background: transparent; vertical-align: middle; }
+                        .cover-info-table td:first-child { width: 45%; }
+                        .cover-details p { font-size: 13pt; line-height: 1.7; margin-bottom: 16px; }
+                        .kop-surat { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 18px; }
+                        .kop-logo { width: 80px; height: 80px; object-fit: contain; margin-right: 16px; flex-shrink: 0; }
+                        .kop-teks { flex: 1; text-align: center; ${identitas.logo ? 'margin-right: 96px;' : ''} }
+                        .kop-teks h1 { font-size: 15pt; margin: 0; font-weight: bold; text-transform: uppercase; }
+                        .kop-teks p { font-size: 11pt; margin: 4px 0 0 0; }
+                        h1 { font-size: 14pt; text-align: center; font-weight: bold; margin-top: 20px; text-transform: uppercase;}
+                        h2 { font-size: 12pt; font-weight: bold; margin-top: 18px; border-bottom: 1px solid #000; padding-bottom: 3px;}
+                        h3 { font-size: 12pt; font-weight: bold; margin-top: 14px; }
+                        p, ul, ol { margin-top: 6px; margin-bottom: 6px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 12px; margin-bottom: 16px; font-size: 11pt; page-break-inside: avoid;}
+                        th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: top;}
+                        th { font-weight: bold; text-align: center; background: #f3f4f6;}
+                        .ttd-container { display: flex; justify-content: space-between; margin-top: 40px; page-break-inside: avoid; }
+                        .ttd-box { width: 45%; text-align: center; }
+                        .ttd-space { height: 70px; }
+                        .ttd-nama { font-weight: bold; text-decoration: underline; margin-bottom: 2px; }
+                        .page-break { page-break-before: always; }
+                    </style>
+                </head>
+                <body>
+                    ${coverHtml}
+                    <div class="kop-surat">
+                        ${identitas.logo ? `<img src="${identitas.logo}" class="kop-logo">` : ''}
+                        <div class="kop-teks">
+                            <h1>${identitas.nama_sekolah || 'NAMA SEKOLAH'}</h1>
+                            <p>${identitas.alamat || 'Alamat Sekolah'}</p>
+                        </div>
+                    </div>
+                    <div class="content">${htmlContent}</div>
+                </body>
+                </html>
+            `;
+
+            let printWindow = null;
+            try {
+                printWindow = window.open('', '_blank');
+            } catch (e) {
+                printWindow = null;
+            }
+
+            if (printWindow && !printWindow.closed) {
+                printWindow.document.open();
+                printWindow.document.write(printDocHtml);
+                printWindow.document.close();
+                setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                }, 600);
+            } else {
+                const existingFrame = document.getElementById('hidden-print-frame');
+                if (existingFrame) existingFrame.remove();
+
+                const iframe = document.createElement('iframe');
+                iframe.id = 'hidden-print-frame';
+                iframe.style.position = 'fixed';
+                iframe.style.right = '0';
+                iframe.style.bottom = '0';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                document.body.appendChild(iframe);
+
+                const frameDoc = iframe.contentWindow.document;
+                frameDoc.open();
+                frameDoc.write(printDocHtml);
+                frameDoc.close();
+
+                setTimeout(() => {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                }, 600);
+            }
+        };
+
+        const dplCheckboxes = document.querySelectorAll('.dpl-checkbox');
+        const dplCounter = document.getElementById('dpl-counter');
+        const dplError = document.getElementById('dpl-error');
+
+        function updateDPLCounter() {
+            const checkedCount = document.querySelectorAll('.dpl-checkbox:checked').length;
+            dplCounter.innerText = `${checkedCount}/8 dipilih (min. 4)`;
+            if(checkedCount >= 4) { dplCounter.classList.replace('bg-[#F46B9B]', 'bg-emerald-500'); dplError.classList.add('hidden'); } 
+            else { dplCounter.classList.replace('bg-emerald-500', 'bg-[#F46B9B]'); }
+        }
+        dplCheckboxes.forEach(cb => cb.addEventListener('change', updateDPLCounter));
+
+        document.getElementById('generator-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const checkedDPLs = Array.from(document.querySelectorAll('.dpl-checkbox:checked')).map(cb => cb.value);
+            if(checkedDPLs.length < 4) {
+                dplError.classList.remove('hidden');
+                document.getElementById('dpl-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            const apiKey = await getGeminiKey();
+            if (!apiKey && !IS_PREVIEW) { showToast("API Key belum diatur.", "error"); navigate('pengaturan'); return; }
+
+            document.getElementById('generator-empty').classList.add('hidden');
+            document.getElementById('generator-result').classList.add('hidden');
+            document.getElementById('result-actions').classList.add('hidden');
+            document.getElementById('generator-loader').classList.remove('hidden');
+            
+            const btn = document.getElementById('btn-generate');
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyusun Modul Ajar...';
+
+            currentGeneratedMeta = {
+                mata_pelajaran: document.getElementById('gen-mapel').value.trim(),
+                jenjang: document.getElementById('gen-jenjang').value,
+                kelas: document.getElementById('gen-kelas').value.trim(),
+                fase: document.getElementById('gen-fase').value,
+                semester: document.getElementById('gen-semester').value || '-',
+                tahun_pelajaran: document.getElementById('gen-tahun').value.trim() || '-',
+                durasi: document.getElementById('gen-durasi').value.trim(),
+                pertemuan: document.getElementById('gen-pertemuan').value,
+                model: document.getElementById('gen-model').value || '-',
+                pendekatan: document.getElementById('gen-pendekatan').value,
+                topik: document.getElementById('gen-topik').value.trim(),
+                tujuan: document.getElementById('gen-tujuan').value.trim(),
+                dpl: checkedDPLs
+            };
+
+            let instruksiDiferensiasiInti = "";
+            let instruksiDiferensiasiMedia = "";
+            let instruksiDiferensiasiLKPD = "";
+
+            if (currentGeneratedMeta.pendekatan === "Berdiferensiasi" || currentGeneratedMeta.pendekatan === "TaRL") {
+                instruksiDiferensiasiInti = `
+- KELOMPOK A - Kesiapan Tinggi (~25%): Uraikan aktivitas menantang, Media/Alat, Bentuk Produk, & Durasi spesifik.
+- KELOMPOK B - Kesiapan Sedang (~50%): Uraikan aktivitas menengah terpandu, Media/Alat, Bentuk Produk, & Durasi spesifik.
+- KELOMPOK C - Perlu Dukungan (~25%): Uraikan aktivitas dasar dengan bimbingan intensif, Media/Alat, Bentuk Produk, & Durasi spesifik.`;
+                instruksiDiferensiasiMedia = `Pembagian Media Berdasarkan Kelompok:\nKelompok A (Kesiapan Tinggi): [sebutkan]\nKelompok B (Kesiapan Sedang): [sebutkan]\nKelompok C (Perlu Dukungan): [sebutkan]`;
+                instruksiDiferensiasiLKPD = `Susunlah Tugas Praktik LKPD spesifik yang berbeda (Bertingkat) untuk: Tugas Kelompok A, Tugas Kelompok B, dan Tugas Kelompok C.`;
+            } else if (currentGeneratedMeta.pendekatan === "CRT") {
+                instruksiDiferensiasiInti = `
+- Aktivitas Kolaboratif CRT: JABARKAN SECARA EKSPLISIT integrasi Culturally Responsive Teaching (CRT). Kaitkan seluruh aktivitas dengan kearifan lokal, tradisi budaya setempat, atau masalah nyata di lingkungan siswa secara kolaboratif (Sertakan Aktivitas, Media/Alat, Bentuk Produk, dan Durasi).`;
+                instruksiDiferensiasiMedia = `Cantumkan rekomendasi "Media Berbasis Kearifan Lokal/Budaya" yang mendukung CRT.`;
+                instruksiDiferensiasiLKPD = `Susunlah Tugas Praktik LKPD yang menggunakan studi kasus dari lingkungan sosial, budaya, dan kearifan lokal.`;
+            } else {
+                instruksiDiferensiasiInti = `
+- Aktivitas Kolaboratif Kelas: JABARKAN SECARA EKSPLISIT aktivitas pembelajaran untuk seluruh kelas secara kolaboratif (Sertakan Aktivitas, Media/Alat, Bentuk Produk, dan Durasi).`;
+                instruksiDiferensiasiMedia = `Berikan daftar rinci media pembelajaran dan alat standar yang disarankan.`;
+                instruksiDiferensiasiLKPD = `Susunlah Pertanyaan Pemandu dan Tugas Praktik yang terstruktur untuk seluruh siswa.`;
+            }
+
+            const prompt = `Anda adalah seorang Ahli Kurikulum Nasional dan Pendidik Profesional. Buatlah MODUL AJAR Kurikulum Merdeka yang SANGAT DETAIL, PANJANG, dan KOMPREHENSIF. JANGAN MERINGKAS POIN! Uraikan dengan kalimat lengkap!
+
+**ATURAN PENULISAN MATEMATIKA:**
+DILARANG KERAS menggunakan format LaTeX seperti tanda dolar tunggal ($...$) atau dolar ganda ($$...$$) untuk rumus matematika atau equation! Tuliskan rumus menggunakan teks biasa dengan rapi (misal: a^2 + b^2 = c^2, x = y / z, akar(4) = 2) agar teks dapat dicetak tanpa error rendering. JANGAN ADA TANDA DOLAR DI MATEMATIKA!
+
+JANGAN MEMBERIKAN KATA PENGANTAR. Mulai langsung dari judul Romawi I.
+
+**DATA INPUT MODUL AJAR:**
+- Mata Pelajaran: ${currentGeneratedMeta.mata_pelajaran}
+- Kelas / Fase: ${currentGeneratedMeta.kelas} / Fase ${currentGeneratedMeta.fase}
+- Jenjang: ${currentGeneratedMeta.jenjang}
+- Semester: ${currentGeneratedMeta.semester}
+- Tahun Pelajaran: ${currentGeneratedMeta.tahun_pelajaran}
+- Alokasi Waktu: ${currentGeneratedMeta.durasi}
+- Jumlah Pertemuan: ${currentGeneratedMeta.pertemuan} Pertemuan
+- Materi Pokok / Topik: ${currentGeneratedMeta.topik}
+- Model Pembelajaran: ${currentGeneratedMeta.model}
+- Pendekatan Khusus: ${currentGeneratedMeta.pendekatan}
+- Tujuan Pembelajaran: ${currentGeneratedMeta.tujuan}
+- Dimensi Profil Lulusan: ${currentGeneratedMeta.dpl.join(', ')}
+
+**STRUKTUR WAJIB MODUL AJAR (Ikuti Plek/Persis seperti ini menggunakan Markdown dan tabel):**
+
+**I. Identitas Modul Ajar & Dimensi Profil Lulusan**
+(Sebutkan ulang Data Input di atas persis sebagai daftar poin peluru list '*'. Lalu jabarkan deskripsi pengembangan dari ke-${currentGeneratedMeta.dpl.length} Dimensi Profil Lulusan yang dipilih).
+
+**II. Tujuan Pembelajaran & KKTP**
+A. TUJUAN PEMBELAJARAN (Sebutkan ulang tujuan pembelajaran).
+B. KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)
+(Buat Tabel Markdown dengan 6 kolom: No | Tujuan Pembelajaran | Kurang (0-40) | Cukup (41-60) | Baik (61-80) | Amat Baik (81-100). Isi detail indikator/rubrik capaiannya secara spesifik).
+Peserta didik dinyatakan telah mencapai Tujuan Pembelajaran apabila kriteria capaiannya berada pada predikat Baik (nilai 61-80) atau lebih tinggi.
+
+**III. Kerangka Pembelajaran**
+(Uraikan secara mendalam masing-masing 1 paragraf panjang: Praktik Pedagogis, Lingkungan Pembelajaran, Kemitraan Pembelajaran, dan Pemanfaatan Digital).
+
+**IV. Materi Pembelajaran**
+(Tuliskan rangkuman materi lengkap dari bab ini. Uraikan sub-bab A, B, C, dst secara PANJANG LEBAR seolah ini adalah buku cetak siswa, berikan contoh penerapannya).
+
+**V. Langkah-Langkah Kegiatan Pembelajaran**
+(JABARKAN SETIAP PERTEMUAN dari Pertemuan 1 sampai Pertemuan ${currentGeneratedMeta.pertemuan} SECARA TERPISAH DAN PANJANG LEBAR!)
+Setiap pertemuan wajib berisi struktur ini:
+Pertemuan ke-[X] - Materi: [Judul Sub Materi]
+A. Kegiatan Pendahuluan (10 menit)
+(Tuliskan Prinsip, Pembukaan, dan Apersepsi/Pertanyaan Pemantik)
+B. Kegiatan Inti
+- Tabel Pemetaan Sintaks Model Pembelajaran (${currentGeneratedMeta.model}) ke Pengalaman Belajar (Buat tabel: No | Sintaks/Tahap Model | Ditempatkan pada Pengalaman Belajar).
+- PENGALAMAN BELAJAR 1: MEMAHAMI (Eksplorasi Konsep). Jabarkan sintaks yang relevan (Aktivitas Guru & Siswa, Alokasi Waktu).
+- PENGALAMAN BELAJAR 2: MENGAPLIKASIKAN (Aksi Nyata). Jabarkan sintaks relevan. Di bagian ini WAJIB TERDAPAT PENGELOMPOKAN/PENDEKATAN BERIKUT:
+${instruksiDiferensiasiInti}
+- PENGALAMAN BELAJAR 3: MEREFLEKSIKAN (Evaluasi Diri). Jabarkan sintaks terkait dan minimal 3 Pertanyaan Refleksi Diri Murid.
+C. Kegiatan Penutup (10 menit)
+(Tuliskan Kesimpulan dan Tindak Lanjut tugas).
+
+**VI. Media & Sumber Belajar Digital**
+(Berikan daftar komprehensif terkait Template Pembelajaran, Asesmen Digital, Artikel Referensi, Video Pembelajaran).
+${instruksiDiferensiasiMedia}
+
+**LAMPIRAN 1: Asesmen (Penilaian)**
+A. Teknik Penilaian (Sikap: Observasi, Pengetahuan: Tes Tertulis, Keterampilan: Unjuk Kerja).
+B. Rubrik Penilaian Proyek/Diskusi (Buat Tabel Markdown dengan 5 kolom: Aspek Penilaian | Sangat Baik (4) | Baik (3) | Cukup (2) | Perlu Perbaikan (1). Buat 3 aspek penilaian).
+C. Soal Evaluasi (Pilihan Ganda) (WAJIB berikan 10 Soal Pilihan Ganda A-D yang berbobot HOTS beserta Kunci Jawabannya di akhir).
+
+**LAMPIRAN 2: LKPD (Lembar Kerja Peserta Didik)**
+(Tuliskan struktur LKPD detail untuk setidaknya salah satu pertemuan utama: Judul LKPD, Identitas, Tujuan, Petunjuk, Alat/Bahan, Langkah Kegiatan).
+${instruksiDiferensiasiLKPD}`;
+
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+
+                const result = await response.json();
+                if (result.error) throw new Error(result.error.message || "Gagal menghubungkan ke Gemini");
+
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content?.parts?.[0]?.text) {
+                    currentGeneratedModul = result.candidates[0].content.parts[0].text;
+                    document.getElementById('generator-result').innerHTML = marked.parse(currentGeneratedModul);
+                    document.getElementById('generator-loader').classList.add('hidden');
+                    document.getElementById('generator-result').classList.remove('hidden');
+                    document.getElementById('result-actions').classList.remove('hidden');
+                    document.getElementById('result-actions').classList.add('flex');
+                    showToast("Modul Ajar berhasil di-generate!", "success");
+                } else {
+                    throw new Error("Respons AI kosong atau tidak valid.");
+                }
+            } catch (error) {
+                document.getElementById('generator-loader').classList.add('hidden');
+                document.getElementById('generator-empty').classList.remove('hidden');
+                showToast("Error: " + error.message, "error");
+            } finally {
+                btn.disabled = false; btn.innerHTML = originalBtnHtml;
+            }
+        });
+
+        window.saveResult = async function() {
+            if(!currentGeneratedModul || !currentGeneratedMeta) return;
+            const btnSave = document.querySelector('#result-actions button.bg-\\[\\#10B981\\]');
+            btnSave.disabled = true; btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan';
+
+            const payload = { ...currentGeneratedMeta, konten_modul: currentGeneratedModul, dibuat_pada: IS_PREVIEW ? new Date().toISOString() : serverTimestamp() };
+
+            if (IS_PREVIEW) {
+                payload.id = 'arsip_' + Date.now();
+                mockData.arsip.push(payload);
+                finishAction();
+            } else {
+                try {
+                    await addDoc(collection(db, "arsip_modul_ajar"), payload);
+                    finishAction();
+                } catch(e) {
+                    showToast("Gagal menyimpan ke database", "error");
+                    btnSave.disabled = false;
+                    btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Arsip';
+                }
+            }
+
+            function finishAction() {
+                showToast("Modul Ajar tersimpan di arsip!", "success");
+                setTimeout(() => {
+                    document.getElementById('generator-form').reset();
+                    updateDPLCounter(); 
+                    document.getElementById('generator-result').classList.add('hidden');
+                    document.getElementById('result-actions').classList.add('hidden');
+                    document.getElementById('generator-empty').classList.remove('hidden');
+                    currentGeneratedModul = null; currentGeneratedMeta = null;
+                    btnSave.disabled = false; btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Arsip';
+                    navigate('arsip');
+                }, 800);
+            }
+        };
+
+        const pwaManifest = {
+            "name": "SMADA GENERATOR", "short_name": "SMADA AI",
+            "description": "Generator Modul Ajar berbasis AI untuk Pendidik SMADA",
+            "start_url": ".", "display": "standalone",
+            "background_color": "#FAF6F0", "theme_color": "#7D84E8",
+            "icons": [{"src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%237D84E8'/><path fill='white' d='M256 90c-44 0-82 25-102 61-8-2-16-3-24-3-46 0-83 37-83 83s37 83 83 83h240c50 0 90-40 90-90s-40-90-90-90c-7 0-14 1-21 2C329 105 295 90 256 90z'/></svg>","sizes": "512x512","type": "image/svg+xml","purpose": "any maskable"}]
+        };
+        const manifestBlob = new Blob([JSON.stringify(pwaManifest)], {type: 'application/json'});
+        document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+
+        const swCode = `self.addEventListener('install', event => self.skipWaiting()); self.addEventListener('activate', event => event.waitUntil(clients.claim())); self.addEventListener('fetch', event => { event.respondWith(fetch(event.request).catch(() => new Response('Offline.'))); });`;
+        const swBlob = new Blob([swCode], {type: 'application/javascript'});
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    </script>
+</body>
+</html>
